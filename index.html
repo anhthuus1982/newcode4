@@ -1,0 +1,48 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trading Bot Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Trading Bot Dashboard</h1>
+    <h2>Trạng thái: <span id="status">{{ status }}</span></h2>
+    <h3>Nhật ký hoạt động</h3>
+    <pre id="logs">{{ logs|join('') }}</pre>
+    <canvas id="activityChart" width="400" height="200"></canvas>
+
+    <script>
+        // Cap nhat trang thai va logs tu Flask
+        function updateData() {
+            fetch('/')
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    document.getElementById('status').innerText = doc.querySelector('#status').innerText;
+                    document.getElementById('logs').innerText = doc.querySelector('#logs').innerText;
+                });
+        }
+
+        // Ve bieu do (vi du don gian)
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['1', '2', '3', '4', '5'],
+                datasets: [{
+                    label: 'Bot Activity',
+                    data: [0, 1, 0, 1, 0],  // Du lieu mau
+                    borderColor: 'blue',
+                    fill: false
+                }]
+            }
+        });
+
+        // Cap nhat dinh ky moi 5 giay
+        setInterval(updateData, 5000);
+    </script>
+</body>
+</html>
